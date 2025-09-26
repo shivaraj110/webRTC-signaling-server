@@ -13,6 +13,8 @@ export class SignalingServer {
 
   static getInstance({ port }: { port: number }) {
     const instance = new SignalingServer({ port });
+    console.log("signaling server running on port\t", port);
+
     return instance;
   }
 
@@ -50,7 +52,7 @@ export class SignalingServer {
           console.log(
             "sender " + this.senderId + " sent an offer. SDP : " + message.sdp,
           );
-        } else if (message.type === "answer") {
+        } else if (message.type === "createAnswer") {
           if (ws !== this.receiver) {
             console.error("Only receiver can send answer");
             return;
@@ -58,7 +60,10 @@ export class SignalingServer {
           this.sender?.send(
             JSON.stringify({ type: message.type, sdp: message.sdp }),
           );
-          console.log("receiver " + this.receiverId + " answered the offer");
+          console.log(
+            "receiver " + this.receiverId + " answered the offer... SDP ",
+            JSON.stringify(message.sdp),
+          );
         } else if (message.type === "candidate") {
           if (ws === this.sender) {
             this.receiver?.send(
